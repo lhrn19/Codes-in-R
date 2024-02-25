@@ -1,0 +1,232 @@
+---
+title: "PCA"
+author: "Lauu"
+date: "2023-04-19"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Juan Diego Martínez, Alejandro Vega, Juan Nicolás Sepúlveda y Laura Hernández.
+
+# PCA
+
+# Punto 1:
+
+```{r }
+S = matrix(c(5, 2 ,2, 2 ),nrow= 2)
+```
+
+Autovalores y autovectores
+
+```{r}
+ev = eigen(S)
+val = ev$values
+vec = ev$vectors
+```
+
+Proporción de variabilidad explicada por Y1
+
+```{r}
+lt = val[1]+val[2]
+p = val[1]/lt
+
+```
+
+Como Y1 explica el 0.85 de los datos, podemos reducir la dimensionalidad a solo Y1, luego la componente principal de Y1, sería -0.89X1-0.44X2
+
+## Punto 2
+
+## 
+
+a\.
+
+```{r}
+
+
+#convertir la matriz de covarianza a una de correlación
+ro = cov2cor(S)
+
+#determinar las componentes princiaples con ro
+ev1 = eigen(ro)
+val1 = ev1$values
+vec1 = ev1$vectors
+
+
+lt1 = val1[1]+val1[2]
+p1 = val1[1]/lt1
+
+
+print("la matriz de correlación es")
+ro
+ 
+
+print(" la componente Y1 =0.7071068*X1+0.7071068*x2  ")
+
+print(" la componente Y2 =-0.7071068*X1+0.7071068*x2  ")
+print("El total de variación explicada por Y1 es ")
+p1
+
+
+
+```
+
+b\. Comparando con el punto 1, las componentes no son las mismas porque al estandarizar se pierde información respecto a la varianza.
+
+c\.
+
+```{r}
+
+py1_z1=vec1[1,1]*sqrt(val1[1])
+py1_z2=vec1[2,1]*sqrt(val1[1])
+py2_z1=vec1[1,2]*sqrt(val1[2])
+
+py1_z1
+py1_z2
+py2_z1
+```
+
+# Punto 3
+
+a\. Determine the sample principal components and their variances for these data
+
+```{r}
+xbarra = c(155.6,14,7,nrow=2)
+S1 = matrix(c(7476.45,303.62,
+303.62, 26.19),nrow=2)
+
+
+```
+
+```{r}
+ev2 = eigen(S1)
+val2 = ev2$values
+vec2 = ev2$vectors
+
+print("La componente princial Y1 = -0.99917337x1-0.04065185x2")
+print("La componente princial Y2 = -0.99917337x2+0.04065185x1")
+print(" y la varianza es 7488.80293 y    13.83707 respectivamente")
+
+```
+
+b\.
+
+```{r}
+lt3 = val2[1]+val2[2]
+p3 = val2[1]/lt3
+print("la porporcion total de la variabilidad explicad apor y1 es ")
+p3
+```
+
+c\.
+
+Coeficientes de correlación
+
+```{r}
+#Para y1 
+
+y1_x1 = vec2[1,1]*sqrt(val2[1]/S1[1,1])
+y1_x2 = vec2[2,1]*sqrt(val2[1]/S1[2,2])
+
+#Para y2
+
+y2_x1 = vec2[1,2]*sqrt(val2[2]/S1[1,1])
+y2_x2 = vec2[2,2]*sqrt(val2[2]/S1[2,2])
+
+
+coef = matrix(c(y1_x1 ,y2_x1,y1_x2, y2_x2 ),ncol= 2)
+coef
+```
+
+De lo anterior podemos concluir que X1 contribuye más a la determinación de y1 que X2
+
+# PUNTO 4
+
+a\.
+
+```{r}
+ro2 = cov2cor(S1)
+
+ev2r = eigen(ro2)
+val2r = ev2r$values
+vec2r = ev2r$vectors
+
+
+print("La componente princial Y1 =0.7071068x1+0.7071068x2")
+print("La componente princial Y2 =-0.7071068x1+0.7071068x2")
+ print(" y las varianzas son 1.6861434 y  0.3138566 respectivamente")
+```
+
+b\.
+
+```{r}
+lt4 = val2r[1]+val2r[2]
+p4 = val2r[1]/lt4
+print("la proporción de variabilidad total explicada por y1 es")
+p4
+
+```
+
+c\.
+
+coeficientes de correlación
+
+```{r}
+y1_x1r = vec2r[1,1]*sqrt(val2r[1]/ro2[1,1])
+y1_x2r = vec2r[2,1]*sqrt(val2r[1]/ro2[2,2])
+
+#Para y2
+
+y2_x1r = vec2r[1,2]*sqrt(val2r[2]/ro2[1,1])
+y2_x2r = vec2r[2,2]*sqrt(val2r[2]/ro2[2,2])
+
+#los pesos son la correlación
+coefr = matrix(c(y1_x1r ,y2_x1r,y1_x2r, y2_x2r ),ncol= 2)
+coefr
+```
+
+Para Y1 tanto X1 como X2 tienen un peso de 0.91, luego ambas son significantivas para esta componente.
+
+d\. Es mejor con la matriz de correlación. Esto porque al estandarizar los datos nos quitamos el problema de que una variable con una magnitud muy grande se lleve todo el "protagonismo" al ser muy grande a comparación de las otras variables de magnitud pequeña.
+
+# Punto 5
+
+a\. Se determina S y las componentes principales
+
+```{r}
+s5 = cov(stock_data)
+
+ev5 = eigen(s5)
+val5 = ev5$values
+vec5 = ev5$vectors
+
+
+print("Y1= 0.2228228x1+ 0.3072900x2+0.1548103x3+0.6389680 x4+ 0.6509044 x5")
+print("Y2= 0.6252260x1+ 0.5703900 x2+0.3445049 x3-0.2479475 x4-0.3218478 x5")
+print("Y3= 0.32611218x1-0.24959014 x2-0.03763929 x3-0.64249741 x4+  0.64586064x5")
+print("Y4=0.6627590x1  -0.41400935x2  -0.4970499x3 + 0.3088689x4  -0.2163758x5")
+print("Y5= 0.11765952x1  -0.58860803x2+ 0.78030428x3+ 0.14845546x4 -0.09371777x5")
+
+```
+
+b\.
+
+```{r}
+lt5 =  sum(val5)
+for (a in 1:length(val5)){
+  
+  p = val5[a]/lt5
+  cat("y",a,"explica una proporción de variabilidad de",p, "\n" )
+  
+}
+```
+
+Note que con las 3 primeras componentes se puede explicar más del 90% de la variabilidad, luego se pueden descartar las otras dos componentes.
+
+c\. Después de haber hecho en análiss de PCA, se puede afirmar que se puede reducir la dimensionalidad de 5 a 3 perdiendo una variabilidad menor que el 10%.
+
+prueba de la f pca
+
+# Punto 6

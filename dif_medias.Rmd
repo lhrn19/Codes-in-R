@@ -1,0 +1,415 @@
+---
+title: "Dif medias"
+author: "Lauu"
+date: "2023-04-19"
+output: html_document
+---
+
+## Diferencia de medias
+
+Funciones:
+
+```{r}
+#Prueba para la igualdad de medias
+dif_medias <- function(X_barra,S,alpha,n) {
+  
+  q = length(X_barra)
+  c = matrix(c(1,-1,0,1,0,-1),nrow = 2, byrow  = TRUE)
+  
+  in_csc = solve(c%*%S%*%t(c))
+  T_sq = n*t(c%*%X_barra)%*%in_csc%*%(c%*%X_barra)
+  f = qf(p=alpha, df1=q-1, df2=n-q+1,lower.tail = FALSE, log.p = FALSE)
+  pepe = ((n-1)*(q-1)/(n-q+1)) *f
+  print("T_cuadrado:")
+  print(T_sq)
+  print("pepe:")
+  print(pepe)
+  if (T_sq>pepe){
+    print("Según los datos, rechaza la Ho con un alpha..")
+  }
+  else{print("Según los datos, no se puede rechazar la Ho con un alpha..")}
+  
+  
+}
+
+#intervalos de confianza (T2) simultáneos para diferencias entre pares de las medias
+
+
+int_T2 <- function(X_barra,S,alpha,n,c) {
+  q = length(X_barra)
+  f = qf(p=alpha, df1=q-1, df2=n-q+1,lower.tail = FALSE, log.p = FALSE)
+  pepe = ((n-1)*(q-1)/(n-q+1)) *f
+  int1 = t(c)%*%X_barra+sqrt(pepe)*sqrt(t(c)%*%S%*%c/n)
+  int2 = t(c)%*%X_barra-sqrt(pepe)*sqrt(t(c)%*%S%*%c/n)
+  print( "los lim de los intervalos son")
+  print(int1)
+  print(int2)
+  
+  
+  
+}
+
+#
+#comparacion vector de medias
+com_vec_medias<- function(Tr1,Tr2,alpha) {
+  
+  # la matriz de tratamientos se pone [x1, x2] con esas ob vectoriales
+  d = 0
+  n1 = nrow(Tr1)
+  n2 = nrow(Tr2)
+  p = ncol(Tr1) #num de var
+  
+  x1_barra = matrix(c(mean(Tr1[,1]), mean(Tr1[,2])), nrow = 2)
+  x2_barra = matrix(c(mean(Tr2[,1]), mean(Tr2[,2])), nrow = 2)
+  
+  S1 = cov(Tr1)
+  S2 = cov(Tr2)
+  
+  spooled = ((n1-1)*S1 +(n2-1)*S2)/(n1+n2-2) 
+  print("Spooled =")
+  print(spooled)
+  
+  inv = solve((1/n1+1/n2)*spooled)
+  T2 = t(x1_barra- x2_barra - d)%*%inv%*%(x1_barra- x2_barra - d)
+  f = qf(p=alpha2, df1=p, df2=n1+n2-p-1,lower.tail = FALSE)
+  c2 = ((n1+n2-2)*p/(n1+n2-p-1)*f)
+  
+  print("T_cuadrado:")
+  print(T2)
+  print("c2:")
+  print(c2)
+  if(T2>c2){
+    print("Según los datos, rechaza la Ho con un  nivel de confianza 1-alpha..")
+  }
+  else{print("Según los datos, no se puede rechazar la Ho con un nivel de confianza de 1-alfa..")}
+
+}
+
+
+# intervalos de confianza simultáneos
+
+int_c2 <- function(Tr1,Tr2,alpha) {
+  # la matriz de tratamientos se pone [x1, x2] con esas ob vectoriales
+  d = 0
+  n1 = nrow(Tr1)
+  n2 = nrow(Tr2)
+  p = ncol(Tr1) #num de var
+  
+  x1_barra = matrix(c(mean(Tr1[,1]), mean(Tr1[,2])), nrow = 2)
+  x2_barra = matrix(c(mean(Tr2[,1]), mean(Tr2[,2])), nrow = 2)
+  
+  S1 = cov(Tr1)
+  S2 = cov(Tr2)
+  
+  spooled = ((n1-1)*S1 +(n2-1)*S2)/(n1+n2-2) 
+  
+  
+  f = qf(p=alpha2, df1=p, df2=n1+n2-p-1,lower.tail = FALSE)
+  c = sqrt((n1+n2-2)*p/(n1+n2-p-1)*f)
+  
+  a = matrix(c(0,0), nrow = 2)
+  inte = c(0,0)
+  
+  
+  for (x in 1:p){
+    a[x] =1
+    inte[1] =  t(a)%*%(x1_barra-x2_barra)+ c%*%sqrt(t(a)%*%((1/n1+1/n2)*spooled)%*%a)
+    inte[2] =  t(a)%*%(x1_barra-x2_barra)- c%*%sqrt(t(a)%*%((1/n1+1/n2)*spooled)%*%a)
+    cat("los intervalos para la variable ",x, "son", inte)
+    print("")
+    a[x]=0
+    inte=c(0,0) 
+    
+    
+  }
+
+  
+  
+  
+  
+}
+
+
+```
+
+# Punto 1
+
+## a
+
+```{r pressure}
+n = 40
+X_barra = c(46.1, 57.3, 50.4)
+S = matrix(c(101.3 ,63.0 ,71.0,63.0, 80.2, 55.6, 71.0 ,55.6 ,97.4),nrow = 3, ncol = 3)
+alpha = 0.05
+
+
+dif_medias(X_barra,S,alpha,n)
+alpha
+
+```
+
+### b
+
+```{r}
+print("Para miu 1 y miu 2")
+c12 = matrix(c(1,-1, 0), nrow = 3) # mu1 -mu 2
+int_T2(X_barra,S,alpha,n,c12)
+
+
+print("Para miu 3 y miu 2")
+c23 =  matrix(c(0,-1, 1), nrow = 3)  # mu3 -mu 2
+int_T2(X_barra,S,alpha,n,c23)
+
+print("Para miu 1 y miu 3")
+c31 =  matrix(c(1,0, -1), nrow = 3) # mu1 -mu 3
+int_T2(X_barra,S,alpha,n,c31)
+```
+
+# Punto 2
+
+### a-b.
+
+```{r}
+
+Trata2 = matrix(c(3,1,2,3,6,3), ncol = 2) # tratamiento 2
+Trata3 = matrix(c(2,5,3,2,3,1,1,3), ncol = 2) # tratamiento 3
+
+
+alpha2 = 0.01
+
+com_vec_medias(Trata2,Trata3,alpha2)
+```
+
+### c
+
+```{r}
+int_c2(Trata2,Trata3,alpha)
+
+```
+
+# Punto 3
+
+### a
+
+```{r}
+z1 = c(10, 5, 7, 19, 11, 18)
+z2 = c(2, 3, 3, 6, 7, 9)
+y =c(15 ,9 ,3 ,25 ,7 ,13)
+
+
+```
+
+Modelo de regresión lineal
+
+```{r}
+
+df = data.frame(z1,z2,y)
+yj = lm(y~z1 + z2, data = df)
+summary(yj) #erro estandar es lo mismo que la dev estanadar
+cat("el modelo de regresión es:" )
+
+
+```
+
+### b. Intervalos de confianza
+
+```{r}
+
+int_conf_1_1<- function(beta_gorro,alpha,var_beta_gorro,n,p) {
+  t = qt(alpha/2,n-p-1)
+  print(t)
+  i1= beta_gorro + t*sqrt(var_beta_gorro)
+  i2= beta_gorro - t*sqrt(var_beta_gorro)
+  
+  cat("los intervalos para ",beta_gorro, "son")
+  print( c(i1,i2))
+  
+  
+}
+#para b1
+
+#int_conf_1_1(1.7823,0.05,0.4982,6,2)
+#para b2
+#int_conf_1_1(-2.1883,0.05,1.032,6,2)
+
+confint(yj)
+```
+
+### c.
+
+```{r}
+summary(yj)
+
+# si el pvalor es menor que el alfa rechazo h0
+```
+
+Note que para un alfa = 0.05, se rechaza la h0 de que el coef b1 es cero puesto que alfa\>p-value
+
+### d.
+
+El valor esperado de la predicción E(y) es
+
+```{r}
+z12 = data.frame(z1=c(6), z2=c(4))
+
+predict(yj, newdata = z12)
+
+```
+
+Ahora para le intervalo de confianza del valor esperado E(Y)
+
+```{r}
+predict(yj, newdata = z12, interval = 'confidence',level=0.95)
+```
+
+### e.
+
+Ahora para el intervalo de confianza para la predicción Y
+
+```{r}
+predict(yj, newdata = z12, interval = 'prediction',level=0.95)
+```
+
+# Punto 4
+
+```{r}
+library(MASS)
+
+```
+
+### a. Ajuste de regresión lineal
+
+```{r}
+#para tomar todas ~.
+b = lm(medv~lstat, data = Boston)
+summary(b)
+```
+
+La pendiente no es cero sino -0.95. Se rechaza que la pendiente pueda ser cero pues el p valor es 2e-16, luego para practicamente cualqueir alpha, alpha\>p-valor
+
+### b. El intervalo de confianza 95% de los coeficientes es
+
+```{r}
+confint(b,level = 0.95)
+```
+
+### c.
+
+```{r}
+k =data.frame(lstat= c(5,10,15))
+predict(b,newdata =k,level = 0.95,interval = 'confidence' )
+```
+
+```{r}
+k =data.frame(lstat= c(5,10,15))
+predict(b,newdata =k,level = 0.95,interval = 'prediction' )
+```
+
+# Punto 5:
+
+# Manova
+
+Se establecen las matrices de datos
+
+```{r}
+t1 = matrix(c(2,3,7,2,7,9,2,5,1,5), nrow = 5)
+t2 = matrix(c(3,2,9,2,4,4), nrow = 3)
+t3 = matrix(c(1,7,4,3,4,2,9,2),nrow = 4) 
+
+n1 = nrow(t1)
+n2 = nrow(t2)
+n3 = nrow(t3)
+nt = n1+n2+n3
+
+p = ncol(t1)
+g = 3 #numero de tratamientos
+
+cat("p = ",p,"\n")
+
+cat("g = ",g)
+```
+
+Se toman los vectores de las variables x, y
+
+```{r}
+xi = matrix(c(t1[,1],t2[,1],t3[,1]),ncol = 1) 
+yi = matrix(c(t1[,2],t2[,2],t3[,2]),ncol = 1)
+
+```
+
+Se determina X barra, las medias de cada tratamiento y las matrices de covarianza
+
+```{r}
+
+
+xbarra = matrix(c(mean(xi), mean(yi)), ncol = 1)
+
+#promedios de x,y en cada tratamiento 
+
+xb1 = matrix(c(mean(t1[,1]), mean(t1[,2])), ncol = 1)
+xb2 = matrix(c(mean(t2[,1]), mean(t2[,2])), ncol = 1)
+xb3 = matrix(c(mean(t3[,1]), mean(t3[,2])), ncol = 1)
+
+s1 = cov(t1) #matriz de covarianzas del tratamiento 1
+s2 = cov(t2)
+s3 = cov(t3)
+
+```
+
+Se determina B,W T y el estadístico lamda de wilks
+
+```{r}
+
+#taos
+
+tao1 = xb1 - xbarra
+tao2 = xb2 - xbarra
+tao3 = xb3 - xbarra
+
+W = (n1-1)*s1+ (n2-1)*s2+ (n3-1)*s3
+B = n1*(tao1%*%t(tao1))+n2*(tao2%*%t(tao2))+n3*(tao3%*%t(tao3))
+T = W+B
+
+#estadistico
+wilks = det(W)/det(T)
+
+```
+
+# Tabla one-way manova
+
+```{r}
+source = matrix(c("Tratamiento (H)", "Residual (E)", "Total"), nrow = 3)
+
+SSCP_1_1 = matrix(c(B[1,1],W[1,1],T[1,1]), ncol=1)
+SSCP_1_2 = matrix(c(B[1,2],W[1,2],T[1,2]), ncol=1)
+SSCP_2_1 = matrix(c(B[2,1],W[2,1],T[2,1]), ncol=1)
+SSCP_2_2 = matrix(c(B[2,2],W[2,2],T[2,2]), ncol=1)
+
+df = matrix(c(g-1,n1+n2+n3-g,n1+n2+n3-1),nrow = 3)
+
+tab = data.frame(source,SSCP_1_1,SSCP_1_2,SSCP_2_1,SSCP_2_2,df,wilks)
+
+print(tab)
+```
+
+# Pruebas de hipótesis
+
+Se toma el caso según el p y el g, en este caso p=2, g\>2, luego
+
+```{r}
+alpha = 0.05
+F = qf(p=alpha, df1=2*(g-1), df2= 2*(nt-g-1),lower.tail = FALSE)
+
+c = (nt-g-1)/(g-1)*((1-sqrt(wilks))/(sqrt(wilks)))
+
+cat("F = ",F,"\n")
+
+cat("c = ",c,"\n")
+
+if(c>F){
+print("Según los datos, rechaza la Ho, es decir existe al menos un tao distinto de cero, con un alpha..")
+  
+}else{
+  cat("Según los datos, no hay evidencia suficiente para rechazar la Ho, es decir existe al menos un tao distinto de cero, con una confianza de",1-alpha)}
+
+```

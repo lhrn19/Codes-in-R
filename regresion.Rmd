@@ -1,0 +1,122 @@
+---
+title: "Regresión"
+author: "Lauu"
+date: "2023-04-19"
+output: html_document
+---
+
+## Regresión
+
+Datos
+
+```{r}
+z1 = c(10, 5, 7, 19, 11, 18)
+z2 = c(2, 3, 3, 6, 7, 9)
+y =c(15 ,9 ,3 ,25 ,7 ,13)
+
+
+```
+
+Modelo de regresión lineal
+
+```{r}
+
+df = data.frame(z1,z2,y)
+yj = lm(y~z1 + z2, data = df)
+summary(yj) #erro estandar es lo mismo que la dev estanadar
+cat("el modelo de regresión es:" )
+
+
+```
+
+Intervalos de confianza
+
+```{r}
+
+int_conf_1_1<- function(beta_gorro,alpha,var_beta_gorro,n,p) {
+  t = qt(alpha/2,n-p-1)
+  print(t)
+  i1= beta_gorro + t*sqrt(var_beta_gorro)
+  i2= beta_gorro - t*sqrt(var_beta_gorro)
+  
+  cat("los intervalos para ",beta_gorro, "son")
+  print( c(i1,i2))
+  
+  
+}
+#para b1
+
+#int_conf_1_1(1.7823,0.05,0.4982,6,2)
+#para b2
+#int_conf_1_1(-2.1883,0.05,1.032,6,2)
+
+confint(yj)
+```
+
+Hipótesis
+
+```{r}
+summary(yj)
+
+# si el pvalor es menor que el alfa rechazo h0
+```
+
+Note que para un alfa = 0.05, se rechaza la h0 de que el coef b1 es cero puesto que alfa\>p-value
+
+El valor esperado de la predicción E(y) es
+
+```{r}
+z12 = data.frame(z1=c(6), z2=c(4))
+
+predict(yj, newdata = z12)
+
+```
+
+Ahora para le intervalo de confianza del valor esperado E(Y)
+
+```{r}
+predict(yj, newdata = z12, interval = 'confidence',level=0.95)
+```
+
+Ahora para el intervalod e confianza para la predicción Y
+
+```{r}
+predict(yj, newdata = z12, interval = 'prediction',level=0.95)
+```
+
+Nota: cuando yo predigo y , es para todas las posibles muestras, es decir para todo b0,b1, ese y va a pertencer al intervalo de y
+
+# Punto 4
+
+```{r}
+library(MASS)
+
+```
+
+Ajuste de regresión lineal
+
+```{r}
+#para tomar todas ~.
+b = lm(medv~lstat, data = Boston)
+summary(b)
+```
+
+La pendiente no es cero sino -0.95. Se rechaza que la pendiente pueda ser cero pues el p valor es 2e-16, luego para practicamente cualqueir alpha, alpha\>p-valor
+
+El intervalo de confianza 95% de los coeficientes es
+
+```{r}
+confint(b,level = 0.95)
+```
+
+c.  Predicciones para el valor esperado de medv y los correspondientes intervalos de confianza del 95% para los valores de lstat=c(5,10,15), cada intervalo corresponde a un lstat, es decir para el intervalo uno es con lstat = 5
+
+```{r}
+k =data.frame(lstat= c(5,10,15))
+predict(b,newdata =k,level = 0.95,interval = 'confidence' )
+```
+
+```{r}
+k =data.frame(lstat= c(5,10,15))
+predict(b,newdata =k,level = 0.95,interval = 'prediction' )
+```
